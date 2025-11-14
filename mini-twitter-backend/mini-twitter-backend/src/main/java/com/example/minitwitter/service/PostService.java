@@ -9,9 +9,9 @@ import com.example.minitwitter.repository.HashtagRepository;
 import com.example.minitwitter.repository.LikeRepository;
 import com.example.minitwitter.repository.PostRepository;
 import com.example.minitwitter.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,20 +40,27 @@ public class PostService {
 
         // Process hashtags
         if (request.getHashtags() != null && !request.getHashtags().isEmpty()) {
+            System.out.println("Processing " + request.getHashtags().size() + " hashtags");
             for (String tagName : request.getHashtags()) {
                 String cleanTag = tagName.toLowerCase().replaceAll("[^a-z0-9]", "");
+                System.out.println("Clean tag: " + cleanTag);
                 if (!cleanTag.isEmpty()) {
                     Hashtag hashtag = hashtagRepository.findByTag(cleanTag)
                             .orElseGet(() -> {
                                 Hashtag newHashtag = new Hashtag(cleanTag);
-                                return hashtagRepository.save(newHashtag);
+                                Hashtag saved = hashtagRepository.save(newHashtag);
+                                System.out.println("Created new hashtag: " + saved.getTag());
+                                return saved;
                             });
                     post.addHashtag(hashtag);
+                    System.out.println("Added hashtag to post: " + hashtag.getTag());
                 }
             }
         }
 
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        System.out.println("Saved post with " + savedPost.getHashtags().size() + " hashtags");
+        return savedPost;
     }
 
     public List<PostResponse> getAllPosts(String currentUsername) {
@@ -85,4 +92,3 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 }
-

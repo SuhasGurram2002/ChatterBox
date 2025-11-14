@@ -1,11 +1,8 @@
 package com.example.minitwitter.dto;
 
 import com.example.minitwitter.entity.Post;
-
 import java.time.LocalDateTime;
-
-import com.example.minitwitter.entity.Post;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +26,11 @@ public class PostResponse {
         this.likeCount = post.getLikeCount();
         this.commentCount = post.getCommentCount();
         this.likedByCurrentUser = likedByCurrentUser;
-        this.hashtags = post.getHashtags().stream()
-                .map(h -> h.getTag())
-                .collect(Collectors.toList());
+        this.hashtags = post.getHashtags() != null ?
+                post.getHashtags().stream()
+                        .map(h -> h.getTag())
+                        .collect(Collectors.toList()) :
+                new ArrayList<>();
     }
 
     // Getters and Setters

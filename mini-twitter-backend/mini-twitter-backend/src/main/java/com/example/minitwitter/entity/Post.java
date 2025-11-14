@@ -29,7 +29,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "post_hashtags",
             joinColumns = @JoinColumn(name = "post_id"),
@@ -63,7 +63,12 @@ public class Post {
     public List<Comment> getComments() { return comments; }
     public void setComments(List<Comment> comments) { this.comments = comments; }
 
-    public List<Hashtag> getHashtags() { return hashtags; }
+    public List<Hashtag> getHashtags() {
+        if (hashtags == null) {
+            hashtags = new ArrayList<>();
+        }
+        return hashtags;
+    }
     public void setHashtags(List<Hashtag> hashtags) { this.hashtags = hashtags; }
 
     public int getLikeCount() {
@@ -75,7 +80,13 @@ public class Post {
     }
 
     public void addHashtag(Hashtag hashtag) {
+        if (hashtags == null) {
+            hashtags = new ArrayList<>();
+        }
         hashtags.add(hashtag);
+        if (hashtag.getPosts() == null) {
+            hashtag.setPosts(new ArrayList<>());
+        }
         hashtag.getPosts().add(this);
     }
 }
